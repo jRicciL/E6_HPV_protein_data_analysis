@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<title> VPH: Cribado Virtual</title>
+	<link rel="stylesheet" type="text/css" href="../style/index_style.css">
+	<link href="https://fonts.googleapis.com/css?family=Arimo" rel="stylesheet"> 
+	<link rel="stylesheet" href="../style/prism.css">
+</head>
+
+<body>
+
+	<section id="titulo1">
+		<div class="box effect2" >
+		<h3>"Estudio <em>in silico</em> de la proteína E6 del Virus del Papiloma Humano para el descubrimiento de fármacos antivirales"</h3>
+		<h5>Joel Ricci López © 2017<br>Queda prohibida la reproducción parcial o total de esta obra sin el permiso formal y explícito del autor y directores de la tesis.</h5>
+		</div>
+	</section>
+<img src="../imagenes/menu.svg" id="menu_icon">
+	<section class="sidebar">
+		<div id="menu">
+			<h2>MENÚ</h2>
+		<ul>
+			<li > <a href="../index.html"> Inicio </a> </li>
+			<li  > <a href="../metodos/obj1.html">Objetivo 1</a> </li>
+			<li class="top" > <a href="../metodos/obj2.html">Objetivo 2</a> </li>
+			<li  > <a href="../metodos/obj3.html">Objetivo 3</a> </li>
+			<li  > <a href="../metodos/obj4.html">Objetivo 4</a> </li>
+			<li  > <a href="../metodos/obj5.html">Objetivo 5</a> </li>
+			<li s href="#"> Resultados </li>
+		</ul>
+		</div>
+	</section>
+	<section id="contenido">	
+		<div id="presentacion">
+			<h3>OBJETIVO 2</h3>
+			<p>En esta sección se presenta una breve descripción del método llevado a cabo y los scripts utilizados en el proceso de simulación de Dinámica Molecular de la proteína E6.
+			</p>
+			<div id="indice">
+		          <ul>
+		          <li > <a href="#s0">Preparación de los sistemas</a> </li>
+		          <li  > <a href="#s1">Simulación de Dinámica Molecular</a> </li>
+		           <li  > <a href="#s2">Propiedades físicas del sistema</a> </li>
+		            <li  > <a href="#s3">Evaluación del equilibrado</a> </li>
+		            <li  > <a href="#s4">Análisis de trayectorias</a> </li>
+		        </ul>
+        </div>
+		</div>
+		<div class="slider">
+			<div class="slide" id="s0">
+				<h4>Preparación de los sistemas</h4>
+				<p>El siguiente script fue utilizado para la generación de los archivos de topología y parámetros de campo de fuerza (.incprd y .prmtop) equivalentes a la proteína solvatada. Para ello se utilizó <span class="text_yellow">AmberTools</span> y la consola <i>tleap</i>.  Los análisis de esta sección fueron realizados en un equipo Aspire R14 Intel® Celeron dualcore 1.50GHz.
+				</p>
+				<br><br>
+				<img src="../imagenes/FINAL_obj_2d_ligs.svg" id="imgR">
+				<br>
+				<p id="pie_imagen">El siguiente script fue utilizado para la generación de los archivos de topología y parámetros de campo de fuerza (.incprd y .prmtop) equivalentes a la proteína solvatada. Para ello se utilizó <span class="text_yellow">AmberTools</span> y la consola <i>tleap</i>.  Los análisis de esta sección fueron realizados en un equipo Aspire R14 Intel® Celeron dualcore 1.50GHz.
+				</p>
+
+				<div id="container-01" class="mol-container"></div>
+		</div>		
+	</div>
+		<div class="footer">
+		<h5>Joel Ricci López © 2017<br>Queda prohibida la reproducción parcial o total de esta obra sin el permiso formal y explícito del autor y directores de la tesis.</h5>
+	</div>
+	</section>
+	
+
+	<a href="#0" class="cd-top top">Top</a>
+
+
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="../script/modernizr.js"></script> <!-- Modernizr -->
+	<script src="../script/script.js"></script>
+	 <!-- Molecular viewer -->
+	<script src="http://3Dmol.csb.pitt.edu/build/3Dmol-min.js""></script>
+		<script>
+$(function() {
+  let element = $('#container-01');
+  let config = { backgroundColor: 'white' };
+  let viewer = $3Dmol.createViewer( element, config );
+  let pdbUri = './e6.pdb';
+  jQuery.get( pdbUri, { 
+    success: function(data) {
+      let v = viewer;
+      v.addModel( data, "pdb" );                       /* load data */
+      v.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
+      v.zoomTo();                                      /* set camera */
+      v.render();                                      /* render scene */
+      v.zoom(1.2, 1000);                               /* slight zoom */
+    },
+    error: function(hdr, status, err) {
+      console.error( "Failed to load PDB " + pdbUri + ": " + err );
+    },
+  });
+});
+</script>
+<script src="../script/prism.js"></script>
+
+</body>
+</html>
+
+<!--
+<section id='titulo'> 
+	<p id='texto'> "Estudio <em>in silico</em> de la proteína E6 del Virus del Papiloma Humano para el descubrimiento de fármacos antivirales" </p>
+	<div id="logoCicese">
+
+				<pre><code class="language-python" > 
+					
+				</code></pre>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<title> VPH: Cribado Virtual</title>
+	<link rel="stylesheet" type="text/css" href="../style/index_style.css">
+	<link href="https://fonts.googleapis.com/css?family=Arimo" rel="stylesheet"> 
+	<link rel="stylesheet" href="../style/prism.css">
+</head>
+
+<body>
+
+	<section id="titulo1">
+		<div class="box effect2" >
+		<h3>"Estudio <em>in silico</em> de la proteína E6 del Virus del Papiloma Humano para el descubrimiento de fármacos antivirales"</h3>
+		<h5>Joel Ricci López © 2017<br>Queda prohibida la reproducción parcial o total de esta obra sin el permiso formal y explícito del autor y directores de la tesis.</h5>
+	</section>
+<img src="../imagenes/menu.svg" id="menu_icon">
+	<section class="sidebar">
+		<div id="menu">
+			<h2>MENÚ</h2>
+		<ul>
+			<li > <a href="../index.html"> Inicio </a> </li>
+			<li  > <a href="../metodos/obj1.html">Objetivo 1</a> </li>
+			<li  > <a href="../metodos/obj2.html">Objetivo 2</a> </li>
+			<li  class="top"> <a href="../metodos/obj3.html">Objetivo 3</a> </li>
+			<li  > <a href="../metodos/obj4.html">Objetivo 4</a> </li>
+      <li  > <a href="./metodos/obj5.html">Objetivo 5</a> </li>
+			<li s href="#"> Resultados </li>
+		</ul>
+		</div>
+	</section>
+	<section id="contenido">	
+		<div id="presentacion">
+			<h3>OBJETIVO 3</h3>
+			<p>En esta sección se presenta una breve descripción del método llevado a cabo y los scripts utilizados en el proceso de obtención y análisis de las moléculas ligando. Todos los procesos de esta sección fueron realizados en un equipo Aspire R14 Intel® Celeron dualcore 1.50GHz.
+			</p>
+        <div id="indice">
+          <ul>
+          <li > <a href="#s0"> Obtención de las móléculas ligando de ZINC15 </a> </li>
+          <li  > <a href="#s1">Cribado Virtual por propiedades ADMETox</a> </li>
+          <li  > <a href="#s2">Cálculo del coeficiente de Tanimoto</a> </li>
+        </ul>
+        </div>
+      </div>
+
+		<div class="slider">
+			<div class="slide" id="s0">
+				<h4>Obtención de las móléculas ligando de ZINC15</h4>
+				<p>A partir de 26 moléculas obtenidas de la bibliografía se hizo una búsqueda por similitud en la base de datos <span class="text_yellow">ZINC15</span>. Dicha búsqueda y la obtención de las moléculas se llevó a cabo utilizando el siguiente <i>script</i>.
+				</p>
+				<br>
+				<pre><code class="language-r"> 
+####### PRIMERA PARTE ######
+# Pasos:
+# Cargar la lista de las 26 moléculas de referencia
+# Para cada ligando en la lista:
+# 	Crear una carpeta con el nombre de la molécula
+# 	Descargar la molécula sola usando su id zinc
+# 	Leer el .smi y extraer el smile, leyendo la linea y haciendo un split con espacio
+# 	Pasar el smile sustituyendo los paréntesis
+
+princ_mol <- read.csv("/directorio/de/la/lista/de/moleculas/REFERENCIA/
+						archivo_con_nombre_e_id_de_moleculas.txt")
+# Este archivo txt posee los nombres e IDs de ZINC15 de cada molécula
+
+names(princ_mol) <- c("name", "zinc_id") # Asigna nombres a cada columna del data frame
+workDir <- "/path/del/directorio/de/trabajo/" 
+
+# Determina las direcciones correspondientes a cada criterio de búsqueda:
+substan <- c("http://zinc15.docking.org/substances/", ".smi")
+inter <- "http://zinc15.docking.org/substances/subsets/interesting.smi?count=all&ecfp4_fp-tanimoto-50="
+simil <- c("http://zinc15.docking.org/substances.smi?count=all&ecfp4_fp-", "&highlight=")
+substruc <- c("http://zinc15.docking.org/substances.smi?count=all&structure-contains=", "&highlight=")
+
+# Lleva a cabo el proceso de obtención de moléculas por similitud para cada molécula de referencia
+setwd(workDir)
+for(i in c(1:length(princ_mol$name))) {
+  molID <- princ_mol$zinc_id[i]
+  molName <- princ_mol$name[i]
+  molDir <- paste(workDir, molName, sep="")
+  out_file <- paste(molDir, "/", molName, sep="")
+  dir.create(molDir)
+
+  ## Descarga substance
+  download.file(paste(substan[1], molID, substan[2], sep=""), paste(out_file, ".smi", sep=""), "wget")
+
+  ## Para descargar por similitud utiliza el SMILE de la molécula
+  # Leer el smile
+  smile <- strsplit(readLines(paste(out_file, ".smi", sep="")), "\\s")[[1]][1]
+  print(molID)
+  print(smile)
+  new_smile_par <- gsub("\\)", "%29", gsub("\\(", "%28", smile))
+  new_smile_brack <- gsub("\\]", "%5D", gsub("\\[", "%5B", new_smile_par))
+  new_smile_arr <- gsub("@", "%40", new_smile_brack)
+  new_smile_equal <- gsub("=", "%3D", new_smile_arr)
+  print(new_smile_equal)
+  ## Descargar tanimoto
+  download.file(paste(simil[1], "tanimoto=", new_smile_equal, simil[2], new_smile_equal, sep=""),
+                paste(out_file, "_tani.smi", sep=""), "wget")
+  ## Descargar dice
+  download.file(paste(simil[1], "dice=", new_smile_equal, simil[2], new_smile_equal, sep=""),
+                paste(out_file, "_dice.smi", sep=""), "wget")
+  download.file(paste(substruc[1], new_smile_equal, substruc[2], new_smile_equal, sep=""),
+                paste(out_file, "_substr.smi", sep=""), "wget")
+}
+
+####### SEGUNDA PARTE PARTE ######
+# Elimina redundancias, cuenta el total de moléculas y guarda todas en un único archivo .smi
+moleculaDirs <- list.dirs("/path/del/directorio/de/trabajo/")
+setwd("moleculaDirs")
+
+# Verifica el total de moléculas descargadas
+todas_las_moleculas <- c()
+for (dir in moleculaDirs) {
+  setwd(dir)
+  files <- list.files(dir)
+  for (file in files) {
+    todas_las_moleculas <- append(readLines(file), todas_las_moleculas)
+  }
+}
+length(todas_las_moleculas) # total
+
+# Elimina redundancias
+all_mol_unique <- unique(todas_las_moleculas)
+length(all_mol_unique) # Total de moléculas únicas (no repetidas)
+
+# Guarda todas las moléculas en un único archivo
+all_mols <- unique(todas_las_moleculas)
+writeLines(all_mols, "todas_las_moleculas.smi")
+
+				</code></pre>
+				
+			</div>
+<br><br>
+			<div class="slide" id="s1">
+				<h4>Cribado Virtual por propiedades ADMETox</h4>
+				<p>Las moléculas en formato <i>.smi</i> fueron sometidas al programa <span class="text_blue"><i>Ligprep</i></span> para generar estructuras tridimencionales en formato <i>.mol2</i>. Posteriormente se utilizó <span class="text_red"><i>Qikprop</i></span> para predecir las propiedades farmacocinéticas de las moléculas. Como resultado se obtuvo una matriz con los valores predichos de cada descriptor de cada molécula, y se guardó en formato <i>.csv</i>. Este archivo generado fue evaluado con el siguiente <i>script</i> para filtrar las moléculas que cumpliesen con los valores deseados mostrados en la Tabla 1 de la tesis.
+				</p>
+				<br>
+				<pre><code class="language-r"> 
+####################################
+# Análisis QikProp
+# 1) Leer los datos a partir de los csv generados por Qikprop
+workDir_Qkp <- "/ruta/del/archivo/csv/"
+setwd(workDir_Qkp)
+# Lee el csv
+qkp_all <- read.csv("nombre_archivo.csv", header = T)
+# Verifica el número de moléculas y que no se repitan
+length(qkp_all_mol$molecule); length(unique(qkp_all_mol$molecule))
+
+#####################################################
+### FILTROS APLICADOS POR ORDEN SELECCIONADO ##
+#####################################################
+
+# Primero, resigno los nombres comunes a las 26 moléculas de referencia, para así ubicarlas
+lista.princ <- read.csv("/directorio/de/la/lista/de/moleculas/REFERENCIA/
+		archivo_con_nombre_e_id_de_moleculas.txt", header = F)
+names(lista.princ) <- c("nombre","id_zinc")
+  # Compruebo que las 26 estén en la lista inicial qkp_all en cada filtro
+  l.i.0 <- intersect(lista.princ$id_zinc, qkp_all_mol$molecule); length(l.i.0)  
+  l.f.0 <- intersect(lista.princ$id_zinc, qkp_all$molecule); length(l.f.0) 
+  # Estas dos listas, representan la entrada inicial
+  # y final del filtro, y me sirve para ver cual ha sido filtrada
+  ref.filtr.0 <- l.i.0[is.na(match(l.i.0, l.f.0))]; length(ref.filtr.0)
+  ref.restantes.0 <- 
+  		lista.princ$id_zinc[is.na(match(lista.princ$id_zinc, ref.filtr.0))]
+  # Verifica quién fue la filtrada
+  lista.princ$nombre[which(lista.princ$id_zinc == ref.filtr.0)]
+
+################################################
+######### APLICACIÓN DE LOS FILTROS ###########
+################################################
+##### 1) RULE OF FIVE #####
+  # Cuántos violan 1 o menospostulados de lipinsky
+  qkp_all_1 <- qkp_all[which(qkp_all$RuleOfFive <= 1),]
+  length(qkp_all_1$molecule)
+  #  27674 moléculas
+  # Compruebo que las 26 estén en la lista resultantel
+  l.f.1 <- intersect(ref.restantes.0, qkp_all_1$molecule); length(l.f.1) 
+  ref.filtr.1 <- l.f.0[is.na(match(l.f.0, l.f.1))]; ref.filtr.1; length(ref.filtr.1)
+  # Verifico quién fue la filtrada
+  lista.princ$nombre[which(lista.princ$id_zinc == ref.filtr.1[1])]
+  lista.princ$nombre[which(lista.princ$id_zinc == ref.filtr.1[2])]
+  # Quienes son las restantes
+  ref.restantes.1 <- ref.restantes.0[is.na(match(ref.restantes.0, ref.filtr.1))]
+
+##### 2) RULE OF THREE #####
+  # Cuántos violan 1 o menospostulados de Jorgensen
+  qkp_all_2 <- qkp_all_1[which(qkp_all_1$RuleOfThree <= 1),]
+  length(qkp_all_2$molecule)
+  # 24682 moléculas
+  # Compruebo que las 26 estén en la lista resultantel
+  l.f.2 <- intersect(ref.restantes.1, qkp_all_2$molecule); length(l.f.2)
+  ref.filtr.2 <- l.f.1[is.na(match(l.f.1, l.f.2))]; ref.filtr.2; length(ref.filtr.2) 
+  # Verifico quién fue la filtrada
+  lista.princ$nombre[which(lista.princ$id_zinc == ref.filtr.2[1])]
+  # Quienes son las restantes
+  ref.restantes.2 <- ref.restantes.1[is.na(match(ref.restantes.1, ref.filtr.2))]
+
+##### 3) ABSORCIÓN ORAL HUMANA #####
+  qkp_all_3 <- qkp_all_2.1[which(qkp_all_2$HumanOralAbsorption >= 2),]
+  length(qkp_all_3$molecule)
+  # 20856 moleculas
+  # Compruebo que las 26 estén en la lista resultante
+  l.f.3 <- intersect(ref.restantes.2.1, qkp_all_3$molecule); length(l.f.3) 
+  ref.filtr.3 <- l.f.2.1[is.na(match(l.f.2.1, l.f.3))]; ref.filtr.3; length(ref.filtr.3) 
+  # Verifico quién fue la filtrada
+  lista.princ$nombre[which(lista.princ$id_zinc == ref.filtr.3[1])]
+  # Quienes son las restantes
+  ref.restantes.3 <- ref.restantes.2.1[is.na(match(ref.restantes.2.1, ref.filtr.3))]
+
+##### 4) NÚMERO DE STARS QIKPROP #####
+  qkp_all_4 <- qkp_all_3[which(qkp_all_3$X.stars <= 1),]
+  length(qkp_all_4$molecule)
+  # 20578 moleculas
+  # Compruebo que las 26 estén en la lista resultante
+  l.f.4 <- intersect(ref.restantes.3, qkp_all_4$molecule); length(l.f.4) 
+  ref.filtr.4 <- l.f.3[is.na(match(l.f.3, l.f.4))]; ref.filtr.4; length(ref.filtr.4) 
+  # Verifico quién fue la filtrada
+  lista.princ$nombre[which(lista.princ$id_zinc == ref.filtr.4[1])]
+  # Quienes son las restantes
+  ref.restantes.4 <- ref.restantes.3[is.na(match(ref.restantes.3, ref.filtr.4))]
+  
+##### 5) PERMEABILIDAD DÉRMICA #####
+  qkp_all_5 <- qkp_all_4[which(qkp_all_4$QPlogKp >= -8 & qkp_all_4$QPlogKp <= -1),]
+  length(qkp_all_5$molecule)
+  # 19119 moleculas
+  # Compruebo que las 26 estén en la lista resultante
+  l.f.5 <- intersect(ref.restantes.4, qkp_all_5$molecule); length(l.f.5) 
+  ref.filtr.5 <- l.f.4[is.na(match(l.f.4, l.f.5))]; ref.filtr.5; length(ref.filtr.5) 
+  # Verifico quién fue la filtrada
+  lista.princ$nombre[which(lista.princ$id_zinc == ref.filtr.5[1])]
+
+
+				</code></pre>
+
+			</div>
+<br>
+<br>
+<div class="slide" id="s2">
+        <h4>Cálculo del Coeficiente de Tanimoto</h4>
+        <p>Para calcular el coeficiente de tanimoto entre un determinado par de moléculas se utilizó el siguiente script que requiere de la librería <a href="http://lifescience.opensource.epam.com/indigo/">Indigo Toolkit</a> y numpy. La entrada es uno o dos archivos .smi con las moléculas a evaluar, en formato SMILES. Y devuelve una matriz <span class="text_yellow">MATRIZ_TANIMOTO_1_vs_2.txt</span>  los coeficientes de tanimoto-
+        </p>
+        <br>
+        <pre><code class="language-python"> 
+from indigo import *
+import numpy as np
+import csv
+
+indigo = Indigo()
+
+# Archivos con los sets de moléculas a comparar
+# si el set se compara contra sí mismo mol_1 == mol_2
+mol_1 = open("MOLECULAS_set_1.smi").readlines()
+mol_2 = open("MOLECULAS_set_2.smi").readlines()
+
+# Archivos de salida
+w = csv.writer(open("MATRIZ_TANIMOTO_1_vs_2.txt","w"))
+
+matrix = []
+for lig_i in mol_ref:
+  col = []
+  for lig_j in mol_2:
+    m1    = indigo.loadMolecule(lig_i) 
+    m2    = indigo.loadMolecule(lig_j)
+
+    m1.aromatize()
+    m2.aromatize()
+    # Calcula la similitud basandose en fingerprints subestructurales (los usados por ZINC15)
+    fp1   = m1.fingerprint("sub");
+    fp2   = m2.fingerprint("sub");
+    simil = "{0:.2f}".format(indigo.similarity(fp1, fp2, "tanimoto"))
+    col.append(simil)
+  matrix.append(col)
+w.writerows(zip(matrix))
+        </code></pre>
+
+      </div>
+
+			<br>
+			<br>
+			<br>
+
+
+	</div>
+		<div class="footer">
+		<h5>Joel Ricci López © 2017<br>Queda prohibida la reproducción parcial o total de esta obra sin el permiso formal y explícito del autor y directores de la tesis.</h5>
+	</div>
+	</section>
+	
+
+	<a href="#0" class="cd-top top">Top</a>
+
+	<script src="../script/prism.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="../script/modernizr.js"></script> <!-- Modernizr -->
+	<script src="../script/script.js"></script>
+
+</body>
+</html>
+
+<!--
+<section id='titulo'> 
+	<p id='texto'> "Estudio <em>in silico</em> de la proteína E6 del Virus del Papiloma Humano para el descubrimiento de fármacos antivirales" </p>
+	<div id="logoCicese">
+
+				<pre><code class="language-python" > 
+					
+				</code></pre>
+				<script src="../script/Three49custom.js"></script>
+	<script type="text/javascript" src="../script/GLmol.js"></script>
+<script type="text/javascript">
+
+// Small molecules can be embedded in the page
+
+var glmol02 = new GLmol('glmol02');
+
+// Proteins can also be embedded in the page but 
+//  you might want to keep it separate.
+
+var glmol01 = new GLmol('glmol01', true);
+glmol01.defineRepresentation = function() {
+   var all = this.getAllAtoms();
+   var hetatm = this.removeSolvents(this.getHetatms(all));
+   this.colorByAtom(all, {});
+   this.colorByChain(all);
+   var asu = new THREE.Object3D();
+   
+   this.drawBondsAsStick(asu, hetatm, this.cylinderRadius, this.cylinderRadius);
+};
+
+$.get("imagenes/e6.pdb", function(ret) {
+$("#glmol01_src").val(ret);
+glmol01.loadMolecule();
+});
+</script>

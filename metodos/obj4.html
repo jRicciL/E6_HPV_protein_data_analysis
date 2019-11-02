@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<title> VPH: Cribado Virtual</title>
+	<link rel="stylesheet" type="text/css" href="../style/index_style.css">
+	<link href="https://fonts.googleapis.com/css?family=Arimo" rel="stylesheet"> 
+	<link rel="stylesheet" href="../style/prism.css">
+</head>
+
+<body>
+
+	<section id="titulo1">
+		<div class="box effect2" >
+		<h3>"Estudio <em>in silico</em> de la proteína E6 del Virus del Papiloma Humano para el descubrimiento de fármacos antivirales"</h3>
+		<h5>Joel Ricci López © 2017<br>Queda prohibida la reproducción parcial o total de esta obra sin el permiso formal y explícito del autor y directores de la tesis.</h5>
+		</div>
+	</section>
+<img src="../imagenes/menu.svg" id="menu_icon">
+	<section class="sidebar">
+		<div id="menu">
+			<h2>MENÚ</h2>
+		<ul>
+      <li > <a href="../index.html"> Inicio </a> </li>
+      <li  > <a href="../metodos/obj1.html">Objetivo 1</a> </li>
+      <li  > <a href="../metodos/obj2.html">Objetivo 2</a> </li>
+      <li  > <a href="../metodos/obj3.html">Objetivo 3</a> </li>
+      <li  class="top"> <a href="../metodos/obj4.html">Objetivo 4</a> </li>
+      <li  > <a href="../metodos/obj5.html">Objetivo 5</a> </li>
+      <li s href="#"> Resultados </li>
+		</ul>
+		</div>
+	</section>
+	<section id="contenido">	
+		<div id="presentacion">
+			<h3>OBJETIVO 4</h3>
+			<p>En esta sección se presenta una breve descripción del método llevado a cabo y los scripts utilizados en el proceso de acoplamiento molecular con Autodock 4 y Autodock Vina.
+				</p>
+		</div>
+		<div class="slider">
+			<div class="slide" id="s0">
+				<h4>Acoplamiento molecular</h4>
+				<p>El siguiente <i>script</i> fue utilizado para llevar a cabo el acoplamiento molecular de los ligandos a la proteína E6 utilizando el programa <span class="text_yellow">Autodock 4</span>.  Este <i>script</i> recibe como entrada un receptor en formato pdb y un set de ligandos en formato mol2 (todos en un único archivo), ambos ubicados en una carpeta "<i><span class="text_blue">sources</span></i>". La ejecución permite preparar los archivos previo a la evaluación del acoplamiento y utilizar multihilos para evaluar en paralelo cada molécula (en función del número de cores disponibles). Como resultado se obtienen archivos .dgl con las coordenadas del acoplamiento proteína-ligando y la energía libre de interacción calculada para cada uno. Además, un archivo <i>dockSummary.txt</i> con el ranking de ligandos ordenado por valores de energía Un <i>script</i> similar fue utilizado para ejecutar <span class="text_red">Autodock Vina</span>.
+				</p>
+				<p>
+				Tanto para Autodock 4 como Vina, la ejecución fue llevada a cabo en el cluster computacional OMICAs del <a href="http://www.cicese.edu.mx/">CICESE</a> y el cluster de supercómputo  <a href="http://www.super.unam.mx/index.php/home/acerca-de">Miztli</a> de la UNAM.
+				</p>
+				<br><br>
+			</div>
+		<pre><code class="language-python"> 
+#!/usr/bin/python2.6
+
+#SBATCH -J #JOB_NAME
+#SBATCH -n #CORES
+#SBATCH -o out_log.out
+#SBATCH -e err_log.err
+
+import sys, os, re, shutil
+import multiprocessing
+import time, timeit
+
+# Timer para el registro de tiempo de ejecución
+start_time = timeit.default_timer() 
+# cwd al path para la ejecución en la dirección temporal por SLURM
+sys.path.append(os.getcwd())
+# Directotio donde está instalado mgtools de AutodockTools
+sys.path.append('/home/jricci/apps/lib/python2.6/site-packages/mgtools')
+
+# #########################
+# ********** INPUTS: ***********
+# #########################
+# Se agregan los nombres de los archivos de entrada y los parámetros de Autodock4
+cores = 24	# Número de cores a utilizar
+receptor = "e16crys.pdb" 	# Nombre del archivo pdb del receptor
+ligandos = "best_79_stack_4.mol2" 	# Nombre del archivo mol2 de los ligandos
+# path del directorio desde el cual se ejecuta este script
+workDirPath = "/LUSTRE/bioinformatica_data/biocomp/jricci/autodock4_multiple"
+# Directorio del pythonsh utilizado por ADTools
+pythonsh = """/tmpu/aguila_g/aguila/joel_ricci/docking/apps
+						/lib/python2.6/site-packages/mgtools/pythonsh"""
+
+# Parametros extra
+gaNumEvals = 25000000 	# Número de evaluaciones por corrida
+gaRun = 50 		# Número de corridas 
+rmsTol = 2.0 	# Valor de RMSD utilizado como criterio de agrupamiento
+npts = "48,48,48"	#Dimecniónes x, y, z de la caja de búsqueda (ntp*0.375 Amstrongs)
+gridCenter = "-60,-40,-55.0" 	# Centro de gridBox
+dirOut = "_Dk" 	# 
+
+# Un comentario para el cabezal del archivo .out
+headerVS = "Este es un script para docking con vina"
+print headerVS 
+
+# #########################
+# ********** PASO 1: ***********
+# #########################
+print "INICIO DEL DOCKING\n"
+input_data =  "Receptor: " + receptor + "\nLigandos: " + ligandos + 
+"\nExhaustividad: " + str(exhaus) + "\ngridSize: " + str(gridSizeXYZ) + 
+"\ngridCenter: " + str(gridCenter) + "\nenergyRange: " + str(energyRange) +  
+"\nnumModes: " + str(numModes)
+print input_data
+
+# Variables con los paths de cada directorio utilizado
+pdbName = receptor.split(".")[0]
+vstRoot = workDirPath
+workDir = workDirPath + "/" + pdbName + dirOut
+scripts = vstRoot + "/scripts/"
+sources = vstRoot + "/sources/"
+#Crea directorio de la carpeta de salida con el nombre del receptor, si existe, crea una nueva
+contador = 0
+while os.path.exists(workDir):
+    contador = contador + 1
+    workDir = workDirPath + "/" + pdbName + dirOut + "_" + str(contador)
+os.makedirs(workDir)
+#Creacion de subdirectorios
+ligandsDir = workDir + "/ligs_mol2" # Guarda los archivos mol2 para cada molécula
+os.makedirs(ligandsDir)
+etcDir = workDir + "/etc/" # Archivos de registro
+os.makedirs(etcDir)
+ligsPdbqtDir = workDir + "/ligands_pdbqt/" # Pdbqt de cada molécula
+os.makedirs(ligsPdbqtDir)
+receptorDir = workDir + "/receptor/" # Receptor pdbqt
+os.makedirs(receptorDir)
+dockingsDir = workDir + "/dockings/" # Resultados .dlg de cada acoplamiento
+os.makedirs(dockingsDir)
+
+# #########################
+# ********** PASO 2: ***********
+# #########################
+print "PASO 2: " + time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+print "2) Extrayendo y convirtiendo ligandos del archivo .mol2\n"
+# Extrae uno a uno los ligandos
+mol_file = open(sources+ligandos, "rw+").readlines()
+mol_file.append(str(mol_file[0]))
+linesVector = []
+siguientes = False
+contador = 0; numerador = 0
+for line in mol_file:
+    if line == mol_file[0]:
+        if siguientes: #Guarda el archivo en
+            contador = contador+1
+            molName =  ligandsDir+"/"+linesVector[1][0:-1]
+            if not os.path.exists(molName+".mol2"):
+                fileOut = open(molName+".mol2", "w")
+                fileOut.writelines(linesVector)
+                fileOut.close()
+                numerador = contador
+            else:
+                fileOut = open(molName + "_" + str(contador - numerador) + ".mol2", "w")
+                fileOut.writelines(linesVector)
+                fileOut.close()
+            linesVector = [] # Reinicia el vector
+            linesVector.append(line)
+        else:
+            linesVector.append(line)
+            siguientes = True
+    else:
+        linesVector.append(line)
+
+# Convierte cada mol2 a PDBQT, utiliza multihilos
+ligandsList = os.listdir(ligandsDir)
+def convertPdbqt(mol):
+    molName = mol.split(".")[0]
+    os.system(pythonsh + " " + scripts + "prepare_ligand4.py -l" +
+              ligandsDir + "/" + mol +
+              " -d " + etcDir + "ligand_dict.py -o"
+              + ligsPdbqtDir + molName + ".pdbqt")
+
+pool = multiprocessing.Pool()
+jobs = []
+for mol in ligandsList:
+    process = multiprocessing.Process(target = convertPdbqt, args=(mol,))
+    jobs.append(process)
+    process.start()
+for job in jobs: #Espera hasta que todos los hilos terminen
+    job.join()
+# Crea un archivo summary de los ligandos
+shutil.copyfile(scripts+"examine_ligand_dict.py", etcDir+"/examine_ligand_dict.py")
+os.system("python " + etcDir + "examine_ligand_dict.py > " + etcDir + "/summaryLigands.txt")
+
+# Obtiene los tipos de atomos a utilizar para crear el archivo .gpf (paso 3)
+line = open(etcDir + "summaryLigands.txt").readlines()[3]
+a =re.sub("[ _:A-Za-z0-9]* \\[", "",line)
+b=re.sub("\\]", "",a)
+ligandTypes = re.sub("\s*[']([A-Za-z]+)[']","\\1",b)
+print ligandTypes
+
+# Prepara el receptor; remueve las moléculas de agua y los H apolares
+pdbqtName = pdbName + ".pdbqt"
+os.system(pythonsh + " " + scripts + "prepare_receptor4.py" +
+          " -r " + sources + receptor +
+          " -A 'checkhydrogens' -U 'nphs' -U 'waters'" +
+          " -o " + receptorDir + pdbqtName
+          )
+
+# #########################
+# ********** PASO 3: ***********
+# #########################
+print "PASO 3: " + time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+print "3) Generando el archivo GPF\n utilizando 'prepare_gpf4.py'"
+# Es creado a partir del receptor y la molécula control, y especifica 
+# el espacio tridimencional de búsqueda, el centro de los grids y la distancia 
+# entre los nodos del grid. También especifica los tipos de átomos a usar en los 
+# ligandos y el receptor, y los nombres de los futuros .maps que se crearán con  autogrid
+gpfName = pdbName + ".gpf"
+os.system(pythonsh + " " + scripts + "prepare_gpf4.py -l" +
+          ligsPdbqtDir + ligandsList[0].split(".")[0] + ".pdbqt" +
+          " -r " + receptorDir + pdbqtName +
+          " -o " + receptorDir + gpfName +
+          " -p ligand_types=" + "'" + ligandTypes + "'" +
+          " -p npts='" + npts +
+          "' -p gridcenter='" + gridCenter + "'")
+
+# #########################
+# ********** PASO 4: ***********
+# #########################
+print "PASO 4: " + time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+print "4) Ejecutando Autogrid\n"
+# Autogrid lleva acabo, para cada tipo de átomo, un precálculo de los parámetros del campo de fuerza usado.
+os.chdir(workDir + "/receptor").
+# Dentro del espacio de búsqueda del grid un átomo de "prueba" es colocado en cada punto del grid. 
+# Después, se calcula la energía (para cada parámetro del campo de fuerza) de interacción de este 
+# átomo con cada átomo (de un tipo de átomo determinado) de la proteína, y luego asignada a este 
+# punto del grid. Finalmente esto conjunto de valores es almacenado en un atomType.map. 
+# De la misma manera se calculan los maps para los potenciales electrostáticos y de solvatación. 
+# Esto simplifica la tarea de autodock4, reduciendo el cálculo de un orden N2 a orden N 
+# (N= número de átomos interactuando en el sistema proteína-ligando) 
+
+os.system("autogrid4 -p " + receptorDir + gpfName +
+          " -l " + receptorDir + pdbName + ".glg")
+
+# #########################
+# ********** PASO 5: ***********
+# #########################
+# Crea el archivo de docking dpf para cada ligando
+print "PASO 5: " + time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+print "5) Creando Archivos DPF\n"
+
+# Tanto para el ligando de referencia como para el resto de los ligandos se ejecuta prepare_dpf42. 
+# El archivo que contiene los parámetros que autodock utilizará para cada acoplamiento entre el ligando 
+# y el receptor, especifica los archivos .map a utilizar, y los parámetos de búsqueda de las mejores 
+# energías e interacción. Los parámetros usados pueden consultarse en el manual de Autodock4.
+ligsPdbqtList = os.listdir(ligsPdbqtDir)
+def prepareDPF(mol, contador):
+    #molName = mol.split(".")[0]
+    #molDir = dockingsDir + mol.split(".")[0] + "/"
+    os.makedirs(dockingsDir + mol.split(".")[0] + "/")
+    os.symlink(ligsPdbqtDir + mol, dockingsDir + mol.split(".")[0] + "/" + mol)
+    for file in os.listdir(receptorDir):
+        os.symlink(receptorDir + file, dockingsDir + mol.split(".")[0] + "/" + file)
+    # Ejecuta prepare dpf
+    os.system(pythonsh + " " + scripts + "prepare_dpf42.py" +
+              " -l " + dockingsDir + mol.split(".")[0] + "/" + mol +
+              " -r " + dockingsDir + mol.split(".")[0] + "/" + pdbqtName +
+              " -o " + dockingsDir + mol.split(".")[0] + "/" + mol.split(".")[0] + ".dpf" +
+              " -p ga_num_evals=" + str(gaNumEvals) +
+              " -p unbound_model='bound'" +
+              " -p rmstol=" + str(rmsTol) +
+              " -p ga_run=" + str(gaRun)
+              )
+    print "\tDpf " + str(contador) + "/" + str(len(ligsPdbqtList)) + ": " + mol.split(".")[0]
+
+reacher = 0
+leap = cores
+contador = 0
+while reacher < len(ligsPdbqtList):
+    try:
+        #if __name__ == '__main__':
+            #pool = multiprocessing.Pool()
+        jobsDpf = []
+            #conta = 0
+        for mol in ligsPdbqtList[reacher:(reacher+leap)]:
+            contador = contador + 1
+            pDpf = multiprocessing.Process(target = prepareDPF, args=(mol,contador,))
+            jobsDpf.append(pDpf)
+            pDpf.start()
+        for job in jobsDpf: #Espera hasta que todos los hilos terminen
+            job.join()
+        reacher = reacher + leap
+    except Exception:
+        print "But nothing happened: DPF"
+
+# #########################
+# ********** PASO 6: ***********
+# #########################
+print "\nPASO 6: " + time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+print "6) Ejecutando Autodock para cada ligando\n"
+
+# Autodock recibe como entrada el archivo .dpf y como salida el archivo log .dlg 
+# En el archivo .dlg, autodock escribe las coordenadas de los ligandos anclados a la 
+# macromolécula en formato dlg (pdbqt en vina), además reporta la información del clustering y 
+# los valores de energía de interacción correpondientes. 
+dockingsList = os.listdir(dockingsDir)
+def autodock_4(dock, contador):
+    os.chdir(dockingsDir + dock)
+    try:
+        os.system("autodock4 -p " + dock + ".dpf" +
+              " -l " + dock + ".dlg")
+        print "\tDocking " + str(contador) + "/" + str(len(dockingsList)) + ": " + dock
+    except Exception:
+        print "Algo estuvo mal: " + dock
+reacher = 0
+leap = cores
+contador = 0
+while reacher < len(dockingsList):
+    try:
+        #if __name__ == '__main__':
+        #pool = multiprocessing.Pool()
+        jobsDpf = []
+        #conta = 0
+        jobsDock = []
+        for dock in dockingsList[reacher:(reacher+leap)]:
+            contador = contador + 1
+            pDock = multiprocessing.Process(target = autodock_4, args=(dock,contador,))
+            jobsDock.append(pDock)
+            pDock.start()
+        for job in jobsDock: #Espera hasta que todos los hilos terminen
+            job.join()
+        reacher = reacher + leap
+    except Exception:
+        print "But nothing happened: autodock"
+
+
+# #########################
+# ********** PASO 7: ***********
+# #########################
+#  Extrayendo y resumiendo
+print "\nPASO 7: " + time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+print "7) Resumiendo resultados del docking\n"
+
+contador = 0
+for docked in dockingsList:
+    contador = contador + 1
+    print "\tResumiendo " + str(contador) + "/" + 
+    		str(len(dockingsList)) + ": " + docked.split(".")[0]
+    os.system(pythonsh + " " + scripts + "summarize_results4.py" +
+              " -d " + dockingsDir + docked +
+              " -t 2.0 -L -a" +
+              " -r " + pdbqtName +
+              " -o " + etcDir + "dockSummary.txt")
+try:
+        print "\nFIN DEL DOCKING " + time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+        totalTime = "Tiempo total: " + time.strftime("%H:%M:%S", 
+        				time.gmtime((timeit.default_timer() - start_time)))
+        print totalTime
+        #time.sleep(10)
+        out = open(workDir + "/total-time.txt", "w")
+        out.writelines(headerVS + "\n\nINICIO:" + 
+        			time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()) + "\n")
+        out.writelines(input_data)
+        out.writelines("\n" + str(len(dockingsList)) + " ligandos evaluados\n" +  totalTime)
+        out.close()
+        os.system("cp " + vstRoot + "/err.err " + workDir)
+        os.system("cp " + vstRoot + "/out.out " + workDir)
+except Exception:
+        print ".err & .out not found."
+				</code></pre>
+			
+	</div>
+		<div class="footer">
+		<h5>Joel Ricci López © 2017<br>Queda prohibida la reproducción parcial o total de esta obra sin el permiso formal y explícito del autor y directores de la tesis.</h5>
+	</div>
+	</section>
+	
+
+	<a href="#0" class="cd-top top">Top</a>
+
+	<script src="../script/prism.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="../script/modernizr.js"></script> <!-- Modernizr -->
+	<script src="../script/script.js"></script>
+</body>
+</html>
+
+<!--
+<section id='titulo'> 
+	<p id='texto'> "Estudio <em>in silico</em> de la proteína E6 del Virus del Papiloma Humano para el descubrimiento de fármacos antivirales" </p>
+	<div id="logoCicese">
+
+				<pre><code class="language-python" > 
+					
+				</code></pre>

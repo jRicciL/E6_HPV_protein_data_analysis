@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<title> VPH: Cribado Virtual</title>
+	<link rel="stylesheet" type="text/css" href="../style/index_style.css">
+	<link href="https://fonts.googleapis.com/css?family=Arimo" rel="stylesheet"> 
+	<link rel="stylesheet" href="../style/prism.css">
+</head>
+
+<body>
+
+	<section id="titulo1">
+		<div class="box effect2" >
+		<h3>"Estudio <em>in silico</em> de la proteína E6 del Virus del Papiloma Humano para el descubrimiento de fármacos antivirales"</h3>
+		<h5>Joel Ricci López © 2017<br>Queda prohibida la reproducción parcial o total de esta obra sin el permiso formal y explícito del autor y directores de la tesis.</h5>
+	</section>
+<img src="../imagenes/menu.svg" id="menu_icon">
+	<section class="sidebar">
+		<div id="menu">
+			<h2>MENÚ</h2>
+		<ul>
+			<li > <a href="../index.html"> Inicio </a> </li>
+			<li  class="top"> <a href="../metodos/obj1.html">Objetivo 1</a> </li>
+			<li  > <a href="../metodos/obj2.html">Objetivo 2</a> </li>
+			<li  > <a href="../metodos/obj3.html">Objetivo 3</a> </li>
+			<li  > <a href="../metodos/obj4.html">Objetivo 4</a> </li>
+      <li  > <a href="./metodos/obj5.html">Objetivo 5</a> </li>
+			<li s href="#"> Resultados </li>
+		</ul>
+		</div>
+	</section>
+	<section id="contenido">	
+		<div id="presentacion">
+			<h3>OBJETIVO 1</h3>
+			<p>En esta sección se presenta una breve descripción del método llevado a cabo y los scripts utilizados en el proceso de obtención y análisis de las secuencias de aminoácidos de la proteína E6. Todos los procesos de esta sección fueron realizados en un equipo Aspire R14 Intel® Celeron dualcore 1.50GHz.
+			</p>
+      <p>Para esta sección no fueron empleados scripts relevantes por lo que sólo se listan las herramientas utilizadas en el transcurso de la investigación.
+      </p>
+        <div id="indice">
+          <ul>
+          <li > <a href="http://doua.prabi.fr/software/seaview">SeaView: Alineamiento de secuencias</a> </li>
+          <li > <a href="http://weblogo.threeplusone.com/">WebLogo3: Logos de secuencias</a> </li>
+          <li > <a href="http://doua.prabi.fr/software/seaview">SeaView: Alineamiento de secuencias</a> </li>
+          <li  > <a href="http://tree.bio.ed.ac.uk/software/figtree/">FigTree: Dendogramas</a> </li>
+          <li  > <a href="http://sts.bioe.uic.edu/castp/">CASTp: Topografía de la proteína</a> </li>
+          <li  > <a href="https://www.cgl.ucsf.edu/chimera/">UCSF Chimera: Visualización y análisis de estructuras moleculares</a> </li>
+          <li  > <a href="http://www.ks.uiuc.edu/Research/vmd/">VMD: Visualización y análisis de estructuras moleculares</a> </li>
+          <li  > <a href="https://salilab.org/modeller/">Modeller: Modelado de proteínas por homología</a> </li>
+          <li  > <a href="http://nbcr-222.ucsd.edu/pdb2pqr_2.0.0/">PDB2PQR y PROPKA: Calculo del pKa de los residuos</a> </li>
+          <li  > <a href="http://autodock.scripps.edu//">Autodock4: Acoplamiento molecular</a> </li>
+          <li  > <a href="http://vina.scripps.edu/">Autodock Vina: Acoplamiento molecular</a> </li>
+          <li  > <a href="http://vina.scripps.edu/">ZINC15: Base de datos de compuestos químicos comercialmente disponibles.</a> </li>
+          <li  > <a href="https://www.schrodinger.com/ligprep">LigPrep: Preparación de estructuras 3D de ligandos.</a> </li>
+          <li  > <a href="https://www.schrodinger.com/qikprop">Qikprop: Predicción ADMETox.</a> </li>
+          <li  > <a href="http://ambermd.org//">AMBER16 y AmberTools: Simulación de Dinámica Molecular</a> </li>
+          <li  > <a href="http://thegrantlab.org/bio3d/index.php">Bio3D: Análisis de trayectorias</a> </li>
+          <li  > <a href="http://ggplot2.org/">ggplot2: Gráficas en R</a> </li>
+        </ul>
+        </div>
+      </div>
+
+		<div class="slider">
+			
+	</div>
+		<div class="footer">
+		<h5>Joel Ricci López © 2017<br>Queda prohibida la reproducción parcial o total de esta obra sin el permiso formal y explícito del autor y directores de la tesis.</h5>
+	</div>
+	</section>
+	
+
+	<a href="#0" class="cd-top top">Top</a>
+
+	<script src="../script/prism.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="../script/modernizr.js"></script> <!-- Modernizr -->
+	<script src="../script/script.js"></script>
+
+</body>
+</html>
+
+<!--
+<section id='titulo'> 
+	<p id='texto'> "Estudio <em>in silico</em> de la proteína E6 del Virus del Papiloma Humano para el descubrimiento de fármacos antivirales" </p>
+	<div id="logoCicese">
+
+				<pre><code class="language-python" > 
+					
+				</code></pre>
+				<script src="../script/Three49custom.js"></script>
+	<script type="text/javascript" src="../script/GLmol.js"></script>
+<script type="text/javascript">
+
+// Small molecules can be embedded in the page
+
+var glmol02 = new GLmol('glmol02');
+
+// Proteins can also be embedded in the page but 
+//  you might want to keep it separate.
+
+var glmol01 = new GLmol('glmol01', true);
+glmol01.defineRepresentation = function() {
+   var all = this.getAllAtoms();
+   var hetatm = this.removeSolvents(this.getHetatms(all));
+   this.colorByAtom(all, {});
+   this.colorByChain(all);
+   var asu = new THREE.Object3D();
+   
+   this.drawBondsAsStick(asu, hetatm, this.cylinderRadius, this.cylinderRadius);
+};
+
+$.get("imagenes/e6.pdb", function(ret) {
+$("#glmol01_src").val(ret);
+glmol01.loadMolecule();
+});
+</script>

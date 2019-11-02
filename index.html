@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<title> VPH: Cribado Virtual</title>
+	<link rel="stylesheet" type="text/css" href="style/index_style.css">
+	<link href="https://fonts.googleapis.com/css?family=Arimo" rel="stylesheet"> 
+	<link rel="stylesheet" href="style/prism.css">
+</head>
+
+<body>
+
+	<section id="titulo1">
+		<div class="box effect2" >
+		<h3>"Estudio <em>in silico</em> de la proteína E6 del Virus del Papiloma Humano para el descubrimiento de fármacos antivirales"</h3>
+		<h5>Joel Ricci López © 2017<br>Queda prohibida la reproducción parcial o total de esta obra sin el permiso formal y explícito del autor y directores de la tesis.</h5>
+		</div>
+	</section>
+	<img src="./imagenes/menu.svg" id="menu_icon">
+	<section class="sidebar">
+		<div id="menu">
+			<h2>MENÚ</h2>
+		<ul>
+			<li class="top" href="#0"> Inicio </li>
+			<li  > <a href="./metodos/obj1.html">Objetivo 1</a> </li>
+			<li  > <a href="./metodos/obj2.html">Objetivo 2</a> </li>
+			<li  > <a href="./metodos/obj3.html">Objetivo 3</a> </li>
+			<li  > <a href="./metodos/obj4.html">Objetivo 4</a> </li>
+			<li  > <a href="./metodos/obj5.html">Objetivo 5</a> </li>
+			<li s href="#"> Resultados </li>
+		</ul>
+		</div>
+	</section>
+	<section id="contenido">	
+		<div id="presentacion">
+			<img src="imagenes/logoCicese.svg" id="img1">
+			<div class="cienciasVida">
+			<b>Programa de Posgrado en Ciencias de la Vida</b>
+				<br><br>
+				Tesis defendida por
+				<br>
+				<b>Joel Ricci López</b>
+				<br>
+				<div class="move left">
+					Directores de Tesis:
+					<br>
+					<b>Dr. Sergio A. Águila Puentes</b>
+					<br>
+					<b>Dr. Carlos A. Brizuela Rodríguez</b>
+				</div>
+				<div class="move right">
+					Comité de tesis:
+					<br>
+					<b>Dra. M. Asunción Lago Leston</b>
+					<br>
+					<b>Dra. Rosa R. Mouriño Pérez</b>
+					<br>
+					<b>Dr. Israel M. Martínez Pérez</b>
+				</div>
+			</div>
+		</div>
+
+		<br>
+		<div class="slider">
+			<div class="slide" id="s0">
+				<h3>Inicio</h3>
+				<p id="inicio_presentacion">Este sitio contiene la metodología y los <i>scripts</i> utilizados en el proyecto de investigación. El menú de la izquierda permite accesar a cada sección de la metodología por objetivo.
+				</p>
+			</div>
+			<br><br>
+			<div class="slide" id="s1">
+				<h3>Resumen del trabajo</h3>
+				<p>La infección por el <b>virus del papiloma humano (VPH)</b> es una de las enfermedades de transmisión sexual más comunes, y algunos VPH han sido identificados como el agente etiológico de diversos tipos de cáncer. Actualmente existen vacunas capaces de prevenir la infección por estos virus. Sin embargo, para el caso de personas ya infectadas, aún sigue siendo necesario el desarrollo de un <b>tratamiento farmacológico eficaz y seguro</b> para combatir la infección y tratar los efectos oncogénicos que éstos ocasionan. Uno de los blancos terapéuticos más estudiados del VPH ha sido la <span class="text_red">oncoproteína E6</span>, identificada como uno de los factores clave en la inmortalización celular y la progresión tumoral en células VPH-positivas.
+				E6 es capaz de promover la degradación de la proteína de supresión tumoral p53, a través de la interacción con la proteína celular <span class="text_blue">ubiquitina ligasa E6AP</span>. Por lo anterior, impedir el acoplamiento E6-E6AP es una de las principales estrategias para inhibir la viabilidad y proliferación de las células infectadas.
+				</p>
+				<img src="imagenes/1.svg" id="img2">
+
+				<p>
+				En el presente trabajo se propuso una metodología <i>in silico</i> enfocada en el <span class="text_yellow">descubrimiento de moléculas</span> capaces de bloquear esta interacción. Para ello, se partió de la estructura cristalográfica de la proteína E6 VPH-16 acoplada al motivo <i>LxxLL</i> de E6AP, y de un conjunto inicial de <b>34,804 moléculas</b> obtenido de la base de datos <i>ZINC15</i> a partir de su similitud estructural con 26 compuestos cuya actividad anti-VPH ha sido evaluada previamente. Después, se realizó un proceso conocido como <b>Cribado Virtual</b> mediante la predicción de la propiedades ADMETox de las moléculas y la <b>Simulación de Acoplamiento Molecular</b> con la proteína E6. Con ello fue posible filtrar compuestos candidato con características farmacocinéticas favorables y con capacidad de interaccionar con E6. Por último, cuatro de estos compuestos fueron seleccionados y, mediante <b>Simulación de Dinámica Molecular</b>, se corroboró la estabilidad de su acoplamiento con E6, y su efecto en la <b>reducción de la afinidad de E6 hacia E6AP</b>. Por lo anterior, la metodología empleada y las moléculas identificadas en este trabajo representan un nuevo punto de partida en el desarrollo de fármacos anti-VPH.
+				</p>
+			</div>
+			<br><br>
+			<div class="slide" id="s2">
+				<h3>Hipótesis</h3>
+				<p>El sitio de unión a E6AP de la proteína viral E6 de los VPH de alto riesgo es un blanco farmacológico cuya evaluación <i>in silico</i>, mediante Cribado Virtual y Dinámica Molecular, permitirá identificar moléculas con propiedades farmacológicas capaces de inhibir la interacción E6-E6AP.
+				</p>
+				<br>
+				<img src="imagenes/3.svg" id="img3">
+			</div>
+			<br><br>
+			<div class="slide" id="s3">
+				<h3>Objetivos</h3>
+				<h4>Objetivo general</h4>
+				<p>Caracterizar y evaluar <i>in silico</i> el sitio de unión a E6AP de la proteína E6 del Virus del Papiloma Humano de alto riesgo para identificar y proponer moléculas con potencial farmacológico en el tratamiento anti-VPH.
+				</p>
+				<br>
+				<h4>Objetivos específicos</h4>
+					<ol>
+						<li>
+							Identificar regiones clave dentro de la estructura de la proteína E6 mediante la comparación de secuencias de aminoácidos las proteínas E6 de los tipos de VPH de alto y bajo riesgo más importantes.
+						</li>
+						<li>
+							Obtener el modelo estructural de las proteínas E6-HPV de alto y bajo riesgo más representativas.
+						</li>
+						<li>
+							Identificar moléculas pequeñas con propiedades farmacocinéticas favorables.
+						</li>
+						<li>
+							Seleccionar posibles fármacos inhibidores de VPH de alto riesgo capaces de interactuar con el pocket de unión a E6AP de la proteína E6.
+						</li>
+						<li>
+							Validar la interacción de las moléculas seleccionadas con la proteína E6 mediante dinámica molecular.
+						</li>
+					</ol>
+				<br>
+			</div>
+		</div>
+	<div class="footer">
+		<h5>Joel Ricci López © 2017<br>Queda prohibida la reproducción parcial o total de esta obra sin el permiso formal y explícito del autor y directores de la tesis.</h5>
+	</div>
+	</section>
+	
+
+	<a href="#0" class="cd-top top">Top</a>
+
+	<script src="script/prism.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="script/modernizr.js"></script> <!-- Modernizr -->
+	<script src="script/script.js"></script>
+</body>
+</html>
+
+<!--
+<section id='titulo'> 
+	<p id='texto'> "Estudio <em>in silico</em> de la proteína E6 del Virus del Papiloma Humano para el descubrimiento de fármacos antivirales" </p>
+	<div id="logoCicese">
+
+				<pre><code class="language-python" > 
+					
+				</code></pre>

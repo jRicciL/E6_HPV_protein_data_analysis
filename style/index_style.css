@@ -1,0 +1,394 @@
+@import url('https://fonts.googleapis.com/css?family=Oswald');
+
+*{
+	margin: 0;
+	padding: 0;
+	font-family: 'Arimo', sans-serif;
+}
+
+#indice{
+	padding: 2%;
+	text-decoration: none;
+	font-weight: bold;
+	list-style: none;
+}
+
+#indice a{
+	text-decoration: none;
+}
+
+#inicio_presentacion{
+	background-color: #444;
+	color: #fff;
+	padding: 2%;
+  margin: 0 auto;
+  width: 100%;
+  text-align: center;
+  border-radius: 8px;
+  font-size: 0.9em;
+}
+
+#menu_icon{
+	position: fixed;
+	z-index: 2;
+	padding: 2% 0% 0% 2%;
+	width: 8%;
+	height: 5%;
+	transition: left 0.2s;
+}
+
+#menu_icon:hover{
+	cursor: pointer;
+	filter: contrast(230%);
+	padding-top: -5%;
+}
+
+.sidebar{
+	position: fixed;
+	left: -15.1%;
+	width: 15%;
+	height: 100%;
+	background: #333;
+	color: #fff;
+	border-right: 0.1em solid #222;
+	transition: left 0.2s;
+}
+
+
+.sidebar h2{
+	text-align: center;
+	margin: 0;
+	padding: 3%;
+	background: #222;
+	font-family: 'Oswald', sans-serif;
+	font-size: 1.3em;
+}
+
+.sidebar ul{
+	position: relative;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.sidebar li{
+	outline: 0.1em solid #222;
+	padding: 4% 6% 4% 6%;
+	transition: all 0.2s;
+}
+
+.sidebar li:hover {
+	background: #666;
+	border-left: 5px solid #fff;
+	cursor: pointer;
+}
+
+
+.sidebar a{
+	color: #fff;
+	padding: 3%;
+	text-decoration: none;
+	display: block;
+	padding: 1%;
+}
+
+
+
+/** **/
+
+section#contenido{
+	padding: 5% 13% 5% 15%;
+	display:inline-block;
+	margin-left: 0%;
+	transition: all 0.2s;
+}
+
+.slider{
+	padding-top: 12%;
+}
+
+.slide h3{
+	font-size: 1.6em;
+	margin-bottom: 1%;
+	color:  	#444; 
+	font-family: 'Oswald', sans-serif;
+}
+
+.slide h4{
+	font-size: 1.2em;
+	color:  	#555; 
+	font-family: 'Oswald', sans-serif;
+}
+
+.slide h5{
+	font-size: 1.1em;
+	color:  	#222; 
+	font-family: 'Oswald', sans-serif;
+	font-weight: lighter;
+}
+
+#presentacion h3{
+	font-size: 1.6em;
+	margin-bottom: 1%;
+	color:  	#444; 
+	font-family: 'Oswald', sans-serif;
+}
+
+.slide p{
+	font-size: 1em;
+	text-align: justify;
+    text-justify: inter-word;
+    text-indent: 4%;
+    line-height: 1.4em;
+}
+
+#presentacion p{
+	font-size: 1em;
+	text-align: justify;
+    text-justify: inter-word;
+    text-indent: 4%;
+    line-height: 1.4em;
+}
+
+.slide li{
+	margin-left: 3%;
+	padding-left: 2%;
+	font-size: 0.9em;
+	text-align: justify;
+    text-justify: inter-word;
+    line-height: 1.3em;
+}
+
+img#img1{
+	display: block;
+    margin: 0 auto;
+    padding-bottom: 2%;
+	width: 40%;
+}
+
+img#img2{
+	display: block;
+    margin: 0 auto;
+	width: 80%;
+	padding-bottom: 4%;
+}
+
+img#img3{
+	display: block;
+    margin: 0 auto;
+	width: 70%;
+	padding-bottom: 2%;
+}
+
+img#imgR{
+	display: block;
+    margin: 0 auto;
+	width: 100%;
+	padding-bottom: 2%;
+}
+
+div.move {
+	padding-top: 5%;
+	font-size: 0.7em;
+	text-align: left;
+    line-height: 1em;
+    color: #444;
+}
+
+div.left {
+  	float: left;
+  	padding-left: 1%;
+}
+
+div.right {
+  	float: right;
+  	padding-right: 1%;
+}
+
+body{
+	background-color: #EEE;
+}
+
+/*------------*/
+section#titulo1{
+	position: fixed;
+
+}
+
+div#presentacion{
+	height: auto;
+	padding-bottom: 3%;
+}
+
+.cienciasVida{
+	font-size: 1em;
+	text-align: center;
+    line-height: 1.3em;
+    color: #222;
+}
+
+.text_red { 
+	background: #e5434366;
+	padding: 0% 0.2%;
+}
+
+.text_yellow { 
+	background: #ffcc0066;
+	padding: 0% 0.2%;
+}
+
+.text_blue { 
+	background: #2784ab66;
+	padding: 0% 0.2%;
+}
+
+.blue_font {
+	color: #2784ab;
+}
+
+/* footer */
+div.footer {
+  background-color: #333;
+  margin: 0 auto;
+  width: 100%;
+  margin-top: 3%;
+  text-align: center;
+  border-radius: 8px;
+}
+
+div.footer h5 {
+	text-align:center;
+	top:0px;
+	font-size: 0.7em;
+	padding: 2% 0 2% 0;
+	color: #fff; 
+	font-weight: lighter;
+}
+
+.box h3{
+	text-align:center;
+	position:relative;
+	top:0px;
+	font-size: 1.7em;
+	padding: 3% 10% 2% 10%;
+	color: #444; 
+	font-family: 'Oswald', sans-serif;
+}
+
+.box h5{
+	text-align:center;
+	position:relative;
+	top:0px;
+	font-size: 0.6em;
+	padding: 0 20% 1% 20%;
+	color: #777; 
+	font-weight: bold;
+}
+
+.box {
+	width:100%;
+	height: auto;
+	background:#FFF;;
+	position: fixed;
+}
+
+/* Codigos*/
+pre {
+	z-index: -1;
+	position: relative;
+	font-size: 0.8em;
+	white-space: pre-wrap;
+}
+
+.mol-container {
+  width: 60%;
+  height: 400px;
+  position: relative;
+}
+
+
+/*==================================================
+ * Effect 2
+ * ===============================================*/
+.effect2
+{
+  position: relative;
+}
+.effect2:before, .effect2:after
+{
+  z-index: -3;
+  position: absolute;
+  content: "";
+  bottom: 15px;
+  left: 10px;
+  width: 50%;
+  top: 50%;
+  max-width:49.5%;
+  background: #555;
+  box-shadow: 0px 28px 15px rgba(00, 00, 00, 0.5);
+  transform: rotate(-2deg);
+}
+.effect2:after
+{
+  transform: rotate(2deg);
+  right: 0px;
+  left: auto;
+}
+
+/*==================================================
+ * Botón Back
+ * ===============================================*/
+
+
+.cd-top {
+  display: inline-block;
+  height: 4%;
+  width: 4%;
+  position: fixed;
+  bottom: 4%;
+  right: 4%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  /* image replacement properties */
+  overflow: hidden;
+  text-indent: 100%;
+  white-space: nowrap;
+  background: rgba(98, 98, 98, 0.8) url(../imagenes/cd-top-arrow.svg) no-repeat center 50%;
+  visibility: hidden;
+  opacity: 0;
+  -webkit-transition: opacity .3s 0s, visibility 0s .3s;
+  -moz-transition: opacity .3s 0s, visibility 0s .3s;
+  transition: opacity .3s 0s, visibility 0s .3s;
+}
+.cd-top.cd-is-visible, .cd-top.cd-fade-out, .no-touch .cd-top:hover {
+  -webkit-transition: opacity .3s 0s, visibility 0s 0s;
+  -moz-transition: opacity .3s 0s, visibility 0s 0s;
+  transition: opacity .3s 0s, visibility 0s 0s;
+}
+.cd-top.cd-is-visible {
+  /* the button becomes visible */
+  visibility: visible;
+  opacity: 1;
+}
+.cd-top.cd-fade-out {
+  /* if the user keeps scrolling down, the button is out of focus and becomes less visible */
+  opacity: .5;
+}
+.no-touch .cd-top:hover {
+  background-color: #2886ad;
+  opacity: 1;
+}
+@media only screen and (min-width: 768px) {
+  .cd-top {
+    right: 20px;
+    bottom: 20px;
+  }
+}
+@media only screen and (min-width: 1024px) {
+  .cd-top {
+    height: 60px;
+    width: 60px;
+    right: 30px;
+    bottom: 30px;
+  }
+
+

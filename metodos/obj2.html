@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<title> VPH: Cribado Virtual</title>
+	<link rel="stylesheet" type="text/css" href="../style/index_style.css">
+	<link href="https://fonts.googleapis.com/css?family=Arimo" rel="stylesheet"> 
+	<link rel="stylesheet" href="../style/prism.css">
+</head>
+
+<body>
+
+	<section id="titulo1">
+		<div class="box effect2" >
+		<h3>"Estudio <em>in silico</em> de la proteína E6 del Virus del Papiloma Humano para el descubrimiento de fármacos antivirales"</h3>
+		<h5>Joel Ricci López © 2017<br>Queda prohibida la reproducción parcial o total de esta obra sin el permiso formal y explícito del autor y directores de la tesis.</h5>
+		</div>
+	</section>
+<img src="../imagenes/menu.svg" id="menu_icon">
+	<section class="sidebar">
+		<div id="menu">
+			<h2>MENÚ</h2>
+		<ul>
+			<li > <a href="../index.html"> Inicio </a> </li>
+			<li  > <a href="../metodos/obj1.html">Objetivo 1</a> </li>
+			<li class="top" > <a href="../metodos/obj2.html">Objetivo 2</a> </li>
+			<li  > <a href="../metodos/obj3.html">Objetivo 3</a> </li>
+			<li  > <a href="../metodos/obj4.html">Objetivo 4</a> </li>
+			<li  > <a href="../metodos/obj5.html">Objetivo 5</a> </li>
+			<li s href="#"> Resultados </li>
+		</ul>
+		</div>
+	</section>
+	<section id="contenido">	
+		<div id="presentacion">
+			<h3>OBJETIVO 2</h3>
+			<p>En esta sección se presenta una breve descripción del método llevado a cabo y los scripts utilizados en el proceso de simulación de Dinámica Molecular de la proteína E6.
+			</p>
+			<div id="indice">
+		          <ul>
+		          <li > <a href="#s0">Preparación de los sistemas</a> </li>
+		          <li  > <a href="#s1">Simulación de Dinámica Molecular</a> </li>
+		           <li  > <a href="#s2">Propiedades físicas del sistema</a> </li>
+		            <li  > <a href="#s3">Evaluación del equilibrado</a> </li>
+		            <li  > <a href="#s4">Análisis de trayectorias</a> </li>
+		        </ul>
+        </div>
+		</div>
+		<div class="slider">
+			<div class="slide" id="s0">
+				<h4>Preparación de los sistemas</h4>
+				<p>El siguiente script fue utilizado para la generación de los archivos de topología y parámetros de campo de fuerza (.incprd y .prmtop) equivalentes a la proteína solvatada. Para ello se utilizó <span class="text_yellow">AmberTools</span> y la consola <i>tleap</i>.  Los análisis de esta sección fueron realizados en un equipo Aspire R14 Intel® Celeron dualcore 1.50GHz.
+				</p>
+				<pre ><code class="language-bash"> 
+source leaprc.gaff 
+source leaprc.protein.ff14SB
+
+loadoff atomic_ions.lib # Carga la librería de los iones
+# Carga el archivo frcmod para los iones metálicos
+loadamberparams frcmod.ions1lsm_hfe_tip3p 
+# Carga la librería ZAFF.prep para la topología y parámetros de los dedos de Cys-Zn
+loadamberprep /path/del/archivo/ZAFF.prep 
+loadamberparams /path/del/archivo/ZAFF.frcmod
+# Se añaden los tipos de átomos correspondientes al dedo de Zinc
+# Previamente estos tipos deben incluirse al archivo PROT.pdb
+addAtomTypes { { "ZN" "Zn" "sp3" } { "S3" "S" "sp3" } { "N2" "N" "sp3" } }
+# Librería de parámetros para las moléculas de agua TIP3P
+source leaprc.water.tip3p
+# Se carga en la variable "mol" el archivo pdb con las coordenadas de la proteína PROT.pdb
+mol = loadpdb PROT.pdb
+
+# Se aplica el parche a los residuos de CYS que conforman el dedo de
+# Zinc, previamente estos residus son nombrados como CY1 en e pdb PROT.pdb
+bond mol.160.ZN mol.37.SG #Bond zinc ion with SG atom of residue 
+bond mol.160.ZN mol.40.SG #Bond zinc ion with SG atom of residue 
+bond mol.160.ZN mol.70.SG #Bond zinc ion with SG atom of residue 
+bond mol.160.ZN mol.73.SG #Bond zinc ion with SG atom of residue 
+
+bond mol.159.ZN mol.110.SG #Bond zinc ion with SG atom of residue 
+bond mol.159.ZN mol.113.SG #Bond zinc ion with SG atom of residue 
+bond mol.159.ZN mol.143.SG #Bond zinc ion with SG atom of residue 
+bond mol.159.ZN mol.146.SG #Bond zinc ion with SG atom of residue 
+
+# Guarda un archivo pdb con la molécula generada
+savepdb mol PROT_new.pdb
+# Obtiene e imprime en consola la carga de la molécula "mol"
+charge mol 
+# Solvata la molécula "mol" en una caja de 15 Amstrongs encada dirección a partir  
+# del último átomo de la superficie de "mol" en las direcciones x, y, z
+solvatebox mol TIP3PBOX 15
+# Nutralización del sistema con Na+ o Cl- en función de la carga
+addions mol Cl- 0 # Si la carga es negativa, agrega Cl
+
+# Guarda el archivo de coordenadas ".inpcrd" y de parámetros ".prmtop"
+saveamberparm mol PROT.prmtop PROT.inpcrd
+quit
+
+				</code></pre>
+				<br><br>
+			</div>
+			<div class="slide" id="s1">
+				<h4>Simulación de Dinámica Molecular</h4>
+				<p>Los siguientes tres <i>scripts</i> fueron utilizados para llevar a cabo la Simulación de Dinámica Molecular con el programa <span class="text_yellow">AMBER16</span>.  Todos los análisis se realizaron en GPUs del cluster de supercómputo <i>aikanaro</i> de la Universidad Andrés Bello, Chile con el apoyo de la Dra. Verónica Jiménez, el Dr. Joel Alderete y el M. C. Matías Zúñiga. 
+				</p>
+				<br>
+				<h5>Minimización de la energía potencial</h5>
+				<span class="text_blue">Ejecución del archivo min.in:</span> 
+				<i>$AMBERHOME/bin/pmemd.cuda -O -i min.in -o min.out -p ./PROT.prmtop -c ./PROT.inpcrd -r PROT.rst -ref ./PROT.inpcrd</i>
+				<pre><code class="language-fortran"> 
+Minimización de la energía del sistema:
+&cntrl
+imin=1,      ! Cuando = 1, indica llevar a cabo una minimización.
+ntmin=1,     ! Método de minimización, cuando = 1 implica cambiar de Steepest decendent (SD) 
+				! a Conjugate Gradient (CG).
+drms=0.1,    ! Criterio de convergencia para el gradiente de energía.
+maxcyc=10000,! Número máximo de ciclos para la minimización.
+ncyc=5000,   ! Cuando ntmin =  1, indica el paso para cambiar de SD a CG.
+ntx=1,       ! Si = 1, lee las coordenadas iniciales del archivo inpcrd.
+irest=0,     ! Flag para reiniciar una simulación; 0 = no reiniciar.
+ntpr=100,    ! Intervalo de pasos para guardar información del sistema.
+ntwr=100,    ! Intervalo de pasos para guardar un archivo restart.
+iwrap=0,     ! Cuando = 1, realiza un wrap en favor de la visualización 
+				! de los átomos dentro de la caja. No tiene ningún efecto sobre la dinámica.
+ntf=1,       ! Determina si evaluar las fuerzas enlazantes con H, 
+				! cuando = 1 se evalúan dichas fuerzas.
+ntb=1,       ! Controla el tipo de simulación y el PME; 
+				! cuando = 1 se mantiene V constante (ensamble NVT)
+cut=10.0,    ! Distancia máxima en A para la evaluación de las interacciones electrostáticas
+nsnb=20,     ! Determina la frecuencia en pasos de integración de 
+				! la evaluación de las fuerzas no enlazantes
+&end
+/
+				</code></pre>
+				<br>
+				<h5>Simulated Annealing y Equilibrado</h5>
+				<span class="text_blue">Ejecución del archivo heat_eq.in:</span> 
+				<i>nohup mpirun -np $NUMERO_CORES $AMBERHOME/bin/pmemd.cuda.MPI -O -i heat_eq.in -o heat_eq.out -p ./PROT.prmtop -c ./PROT_min.rst -r PROT_heat.rst -x PROT_heat.nc &</i>
+			<pre><code class="language-fortran"> 
+	Simulated Annealing y Equilibrado:
+&cntrl
+    iwrap=1, ntx=1, 
+    dt=0.001,   ! Tiempo de integración en ps.
+    nstlim=8000000, ! Número de pasos de simulación a realizar: 8 ns.
+    ntf=2,      ! Si = 2, omite evaluar las interacciones enlazantes de los H.
+    ntc=2,      ! Si = 2, utiliza SHAKE para restringir los enlaces de H.
+    tempi=0.0,  ! Temperatura inicial.
+    temp0=300.0,! Temperatura final o de referencia.
+    ntpr=5000,  ! Intervalo de pasos para guardar información del sistema.
+    ntwx=5000,  ! Intervalo para guardar las coordenadas de los 
+    			! átomos del sistema en un archivo "mdrc".
+    cut=10.0, ntb=1,  
+    ntt=3,      ! Si = 3, se utiliza el termostato de Langevin para regular T.
+    gamma_ln=2.0, ! Frecuencia de colisión atómica para evaluar T.
+    ig=-1,      ! semilla para generar los números aleatorios, 
+    ! cuando = -1 se utiliza la fecha del sistema operativo.
+/
+! Para calentar durante 0.5 ns y equilibrar durante 5 ns.
+! 1) Calienta del paso 1 al paso 500 000 (0.5 ns 0K a 300K)
+&wt type='TEMP0', istep1=0, istep2=500000, value1=0.0, value2=300 /
+! 2) Equilibra a 300K por 0.5ns
+&wt type='TEMP0', istep1=500001, istep2=1000000, value1=300, value2=300 /
+! 3) Calienta a 400K por 0.5ns (0.5 ns, 300K a 400K)
+&wt type='TEMP0', istep1=1000001, istep2=1500000, value1=300.0, value2=400 /
+! 4) Equilibra a 400K por 0.5ns (0.5 ns, 400K)
+&wt type='TEMP0', istep1=1500001, istep2=2000000, value1=400, value2=400 /
+! 5) Enfría a 310K por 0.5ns (0.5 ns, 400K a 310K)
+&wt type='TEMP0', istep1=2000001, istep2=2500000, value1=400.0, value2=310 /
+! 6) Equilibra a 310K por 5.5ns (5.5 ns, 310K)
+&wt type='TEMP0', istep1=2500001, istep2=8000000, value1=310.0, value2=310 /
+
+&wt type='END' /
+&end
+/
+				</code></pre>
+				<br>
+				<h5>Producción de la Dinámica Molecular</h5>
+				<span class="text_blue">Ejecución del archivo prod.in:</span> 
+				<i>nohup mpirun -np $NUMERO_CORES $AMBERHOME/bin/pmemd.cuda.MPI -O -i prod.in -o prod.out -p ./PROT.prmtop -c ./PROT_heat.rst -r PROT_prod.rst -x PROT_prod.nc &</i>
+				<pre><code class="language-fortran"> 
+	Producción de Dinámica Molecular:
+&cntrl
+    imin=0, iwrap=1,
+    ntx=5,      ! Si = 5, lee las coordenadas y velocidades iniciales del archivo restrt.
+    irest=1,    ! Si = 1 reinicia la simulación a partir del archivo restrt.
+    nstlim=50000000, ! Número de pasos de simulación a realizar: 100 ns.
+    dt=0.002,   ! Tiempo de integración en ps.
+    temp0=310.0,! Temperatura final o de referencia.
+    ntf=2, ntc=2,	ntpr=10000, ntwx=10000, cut=10.0,	
+    ntb=2,      ! Cuando = 2 se mantiene P constante (ensamble NPT).
+    ntp=1,      ! Activa el barostato para regular la presión del sistema.
+    ntt=3, gamma_ln=2.0,	ig=-1,
+&end
+/
+				</code></pre>
+			</div>
+			<br>
+			<br>
+			<div class="slide" id="s2">
+				<h4>Propiedades físicas del sistema</h4>
+				<p>Para obtener los valores de Temperatura, Presión, Volumen, Densidad, Energía Potencial y Energía Cinética se utilizó la herramienta <i>process_mdout.perl</i> de AmberTools y los archivos <i>*.out</i> obtenidos al finalizar cada fase de la dinámica. Los archivos resultantes fueron posteriormente evaluados en R y la librería <a href="http://ggplot2.org/"> ggplot2 </a>.
+				</p>
+				<pre ><code class="language-bash"> 
+> pprocess_mdout.perl heat.out 
+				</code></pre>
+			</div>
+			<br>
+			<br>
+			<br>
+			<div class="slide" id="s3">
+			<h4>Evaluación del equilibrado</h4>
+			<p>El siguiente <i>script</i>, implementado en <b>R</b>, crea una función <i>getBoltzmann_AMBER()</i> para el cálculo de la distribución de las energías cinéticas de los átomos del sistema tras el proceso de equilibrado (<a href="http://www.ks.uiuc.edu/Training/Tutorials/namd/namd-tutorial-win-html/node15.html">proceso llevado a cabo</a>). Para ejecutarla se requiere un vector con las energías cinéticas de cada átomo del sistema. Para el caso de AMBER16 se utilizan las velocidades y las masas de los átomos contenidas en los archivos <i>PROT_heat.rst</i>, generados al final del proceso de SA y equilibrado. Para esto se utiliza la herramienta <a href="https://www.unidata.ucar.edu/software/netcdf/netcdf-4/newdocs/netcdf/ncdump.html"><i>ncdump</i></a> para convertir el archivo <i>.rst</i> (en formato NetCDF) a texto plano. </p>
+			
+			<pre><code class="language-R"> 
+# Función en R utilizada para el cálculo de la distribución de las energías cinéticas de los 
+# átomos del sistema tras el proceso de equilibrado.
+getBoltzmann_AMBER <- function(energiaC, A0=0.61584, titulo=""){
+library(ggplot2) # Usada para generar el gráfico de distribución de Maxwell-Boltzmann
+library(foreach)
+
+  #Cálculo de la media de la Energía cinética, max y min
+  maxE <- max(energiaC); maxE
+  minE <- min(energiaC); minE
+  media <- mean(energiaC[,1]); media
+  
+  # Genera un histograma con 100 barras (breaks)
+  hist <- hist(energiaC$V1, breaks= 100, freq=TRUE)
+  ;
+  hist$breaks; length(hist$breaks)
+  hist$density; length(hist$density)
+  
+  # A0 equivale a la constante de Boltzmann kb (0.00198657) multipliada por la temperatura
+  # (kcal/mol) y el objetivo buscar un valor de A0 que optimice el ajuste de la distribución de 
+  # los valores observados a los esperados.
+  a0 <- A0
+  y <- c()
+  # Para cada intervalo del histograma calcula la frecuencia de Ec esperada a una A0 dada,
+  # aplicando la ecuación de 
+  for (x in hist$breaks) {
+    y <- append(y, ((2/sqrt(pi * a0*a0*a0)) * sqrt(x) * exp(-x / a0)))
+  }
+
+  yObs <- append(hist$density, 0 , after = 0)
+  y2 <- y[2:length(y)]
+
+  # Calculo del Error total que calcula el cuadrado de las diferencias 
+  # entre las frecuencias observadas y las esperadas
+  totalError <- sum((y2-hist$density)^2) #Buscamos minimizar este valor
+  
+  kb <- 0.00198657 # constante de boltzmann
+  Temp <- a0/kb; # Estimación de la temperatura a la que corresponde la distribución esperada
+  # Se espera que la Temp obtenida coincida o se acerque a T=310 K, 
+  # temperatura a la que se llevó la simulación
+  
+  # Dataset
+  hist$breaks -> x
+  grafica <- data.frame(cbind(x, yObs, y))
+  grafica
+  
+  #Gráfica con GGplot
+  {
+    ggplot(data=grafica, aes(grafica)) + 
+    geom_col(aes(y=yObs/10, x=x), position="identity", 
+             alpha=0.5, fill = "red", colour = "red") +
+    geom_line(aes(y=y/10, x=x), position="identity", colour = "blue", linejoin = "round", size =1) +
+    ylab("Frecuencia Relativa") +
+    xlab("Energía Cinética (kcal/mol)") +
+    scale_x_continuous(breaks = seq(0.0,6,1), limits= c(0,5.5)) +
+    #ggtitle("Distribución de Maxwell-Boltzmann: E6 HPV16 ") +
+    annotate("text", family="Trebuchet MS", size=5,
+             label = paste("Temperatura: ", round(Temp,digits = 2), 
+                           "\nError: ", round(totalError, digits = 3)), 
+             y = 0.040, x = 2.5) +
+    ggtitle(titulo) + 
+    tema_grafica
+  }
+}
+				</code></pre>
+
+
+			<br><br>
+			<div class="slide" id="s4">
+			<h4>Análisis de trayectorias</h4>
+			<p>El siguiente <i>script</i>, implementado en R, es un ejemplo resumido del análisis de trayectorias de la fase de producción de los ensayos de SDM realizados. Estos análisis incluyen el cálculo del RMSD, RMSF, PCA y Clustering utilizando el paquete <a href="https://www.google.com.mx/search?client=ubuntu&channel=fs&q=bio3d+trajectory+analisys&ie=utf-8&oe=utf-8&gfe_rd=cr&ei=865rWYLTBojz8we2tKywBQ">Bio3D</a>. Los análisis de esta sección fueron realizados en un equipo Aspire R14 Intel® Celeron dualcore 1.50GHz.</p>
+				<pre><code class="language-R">  
+# *** Ejemplo del análisis de trayectorias llevado a cabo, tomando como referencia la 
+# documentación de Bio3D y el protocolo mostrado en la siguiente página: 
+# https://bitbucket.org/Grantlab/bio3d/issues/326/give-up-trying-to-find-out-how-to-extract ***
+
+# Previo a este análisis es conveniente extraer sólo los CA de la trayectoria de la molécula
+# (archivo .nc), ya sea utilizando vmd o cpptraj. Esto evita saturar la memoria RAM del equipo.
+
+# Se carga el paquete Bio3D
+library(bio3d)
+
+# Lectura del archivo pdb de la proteína
+pdb.e6 <- read.pdb("/ruta/al/archivo/proteina_e6.pdb") 
+# Selección de los carbonos alfa de los residuos de la proteína
+ca.inds <- atom.select(pdb.e6, elety = "CA") 
+# Lectura del archivo de trayectoria, ncdf.
+ncdf.e6 <- read.ncdf("/ruta/al/archivo/proteina_e6_sdm_produccion.ncdf") 
+# Superposición de los C-alfa de las conformaciones con el algoritmo de Kabsch.
+xyz.ca.e6 <- fit.xyz(fixed = pdb.e6$xyz, mobile = ncdf.e6,
+         fixed.inds = ca.inds$xyz, mobile.inds = ca.inds$xyz) 
+         # Se crea una matriz de 3N columnas y T filas. N = # de carbonos alfa, T = # frames
+
+####### RMSD #######
+rmd.e6 <- rmsd(pdb.e6, xyz.ca.e6[,]) # Devuelve un vector con T valores de rmsd
+
+####### RMSF #######
+rmf.e6 <- rmsf(xyz.ca.e6[,]) # Devuelve un vector con N valores de rmsf
+
+####### ACP ########
+acp.e6 <- pca.xyz(xyz.ca.e6[,]) 
+# Devuelve una lista de objetos con: los eigenvalores (L), los eigenvectores (U), 
+# los scores (z), y los loadings (au)
+
+####### CLUSTERING #####
+# Se crea la matriz de distancia
+dst.matx <- dist(acp.e6$z[,1:3]) # En este ejemplo se toman en cuenta los CP 1, 2 y 3
+# Se crea el dendograma
+cj.e6 <- hclust(dst.matx, method="ward.D") # Método de clustering
+# Se eligen los clusters en función del k deseado (k = 2 para este ejemplo)
+clus.conf.e6 <- cutree(cj.e6, k=2) # k equivale al número de grupos elegido
+
+##### SELECCIÓN DE LA CONFORMACIÓN POR CLUSTER #####
+# Se crea una conformación por cluster (a y b para este ejemplo), con la media de las 
+# posiciones de los C-alfa en los frames correspondientes a cada cluster.
+conf.med.clus.a <- colMeans(xyz.ca.e6[clus.conf.e6==1,])
+conf.med.clus.b <- colMeans(xyz.ca.e6[clus.conf.e6==2,]) 
+
+# *** Se elige la conformación, dentro de la trayectoria original, que poseea el valor 
+# mínimo de RMSD frente a la conformación media (medioide). Se ejemplica sólo para el cluster a. ***
+
+# RMSD de la trayectoria con la conformación media como referencia
+rmd.med.conf.a <- rmsd(conf.med.clus.a, xyz.ca.e6[,]) 
+# Se elige el frame (conformación) más parecida a la media, en función de su valor de RMSD
+conf.clus.a <- which.min(rmd.med.conf.a); conf.clus.a 
+# El resultado es el número de frame utilizado como estructura representativa del cluster
+
+				</code></pre>
+
+			</div>
+			</div>
+				
+			
+	</div>
+		<div class="footer">
+		<h5>Joel Ricci López © 2017<br>Queda prohibida la reproducción parcial o total de esta obra sin el permiso formal y explícito del autor y directores de la tesis.</h5>
+	</div>
+	</section>
+	
+
+	<a href="#0" class="cd-top top">Top</a>
+
+	<script src="../script/prism.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="../script/modernizr.js"></script> <!-- Modernizr -->
+	<script src="../script/script.js"></script>
+
+</body>
+</html>
+
+<!--
+<section id='titulo'> 
+	<p id='texto'> "Estudio <em>in silico</em> de la proteína E6 del Virus del Papiloma Humano para el descubrimiento de fármacos antivirales" </p>
+	<div id="logoCicese">
+
+				<pre><code class="language-python" > 
+					
+				</code></pre>
