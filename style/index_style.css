@@ -212,6 +212,7 @@ body{
 /*------------*/
 section#titulo1{
 	position: fixed;
+	width: 100%;
 
 }
 
