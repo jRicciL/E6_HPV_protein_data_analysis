@@ -3,7 +3,21 @@
 *{
 	margin: 0;
 	padding: 0;
-	font-family: 'Arimo', sans-serif;
+	font-family: 'News Cycle', sans-serif;
+	font-weight: light;
+}
+
+mark{
+	background-color: rgb(254, 224, 191);
+	padding: 0 3px;
+}
+
+code {
+	color: rgb(214, 84, 119);
+}
+
+b {
+	font-weight: 900;
 }
 
 #indice{
@@ -157,6 +171,25 @@ section#contenido{
 	text-align: justify;
     text-justify: inter-word;
     line-height: 1.3em;
+}
+
+
+figcaption {
+	font-size: 0.8em;
+	margin: auto;
+	text-align: center;
+}
+
+figure {
+	margin: 1em 0 3em 0;
+}
+
+img.center {
+	display: block;
+	margin: 0 auto;
+	padding: 2%;
+	max-width: 780px;
+	/* width: 50%; */
 }
 
 img#img1{
